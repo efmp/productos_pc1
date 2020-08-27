@@ -11,8 +11,11 @@ import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Spinner;
 import android.widget.Toast;
 
@@ -22,8 +25,8 @@ import com.emaza.productsmanagement.entidades.Producto;
 import java.util.ArrayList;
 
 public class detalleProducto extends AppCompatActivity {
-    String data[] = {"Gama Alta","Gama Media", "Gama Baja"};
-    String id, nombre, categoria, precio, stock;
+    String data[] = {"Gama Alta", "Gama Media", "Gama Baja"};
+    String id, nombre, categoria, precio, stock, descuento, estado;
     EditText txtnombre, txtprecio, txtstock;
     Spinner spCategoria;
     Button btnGuardar, btnEliminar;
@@ -31,6 +34,10 @@ public class detalleProducto extends AppCompatActivity {
 
     ConstraintLayout layout;
     LinearLayout lyContainer;
+    RadioGroup rbGrupo;
+    RadioButton rbCinco, rbDiez;
+    CheckBox ckEstado;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,26 +49,24 @@ public class detalleProducto extends AppCompatActivity {
     }
 
 
-
     private void asignarReferencias() {
         Bundle extras = getIntent().getExtras();
         ArrayList<String> lista = extras.getStringArrayList("data");
-        id= extras.getString("id");
-        nombre = getIntent().getStringExtra("nombre");
-        categoria = getIntent().getStringExtra("categoria");
-        precio = getIntent().getStringExtra("precio");
-        stock = getIntent().getStringExtra("stock");
-        id= lista.get(0);
+        id = lista.get(0);
         nombre = lista.get(1);
         categoria = lista.get(2);
         precio = lista.get(3);
         stock = lista.get(4);
-        System.out.println("GETIDIDID"+lista.get(0));
-
+        descuento = lista.get(5);
+        estado = lista.get(6);
 
         txtnombre = findViewById(R.id.txtNombre);
         txtprecio = findViewById(R.id.txtPrecio);
         txtstock = findViewById(R.id.txtStock);
+        rbGrupo = findViewById(R.id.rbGrupo);
+        rbCinco = findViewById(R.id.rbCinco);
+        rbDiez = findViewById(R.id.rbDiez);
+        ckEstado = findViewById(R.id.ckEstado);
 
         btnGuardar = findViewById(R.id.btnGuardar);
         btnEliminar = findViewById(R.id.btnEliminar);
@@ -69,24 +74,42 @@ public class detalleProducto extends AppCompatActivity {
         layout = findViewById(R.id.bgFondo);
         lyContainer = findViewById(R.id.lyContainerData);
 
-        ArrayAdapter adapter = new ArrayAdapter(this,android.R.layout.simple_list_item_1,data);
+        ArrayAdapter adapter = new ArrayAdapter(this, android.R.layout.simple_list_item_1, data);
         spCategoria.setAdapter(adapter);
 
         cargarCombo();
         txtnombre.setText(nombre);
         txtprecio.setText(precio);
         txtstock.setText(stock);
-    }
-
-    private void cargarCombo(){
-
-        switch (categoria){
-            case "Gama Alta": spCategoria.setSelection(0);break;
-            case "Gama Media": spCategoria.setSelection(1);break;
-            case "Gama Baja": spCategoria.setSelection(2);break;
+        if (Double.parseDouble(descuento) <= 0.05) {
+            rbCinco.setChecked(true);
+        } else {
+            rbDiez.setChecked(true);
+        }
+        System.out.println("DATABOOLEANO: "+estado);
+        if (Boolean.parseBoolean(estado)) {
+            ckEstado.setChecked(true);
+        } else {
+            ckEstado.setChecked(false);
         }
     }
-    private void capturarEventos(){
+
+    private void cargarCombo() {
+
+        switch (categoria) {
+            case "Gama Alta":
+                spCategoria.setSelection(0);
+                break;
+            case "Gama Media":
+                spCategoria.setSelection(1);
+                break;
+            case "Gama Baja":
+                spCategoria.setSelection(2);
+                break;
+        }
+    }
+
+    private void capturarEventos() {
         btnGuardar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -113,22 +136,41 @@ public class detalleProducto extends AppCompatActivity {
         });
     }
 
-    private void guardarProducto(){
-        if(txtnombre.getText().toString().equals(""))Toast.makeText(this,"ingrese un nombre",Toast.LENGTH_SHORT).show();
-        else if(txtprecio.getText().toString().equals(""))Toast.makeText(this,"ingrese un precio",Toast.LENGTH_SHORT).show();
-        else if(txtstock.getText().toString().equals(""))Toast.makeText(this,"ingrese un stock",Toast.LENGTH_SHORT).show();
-        else{
+    private void guardarProducto() {
+        if (txtnombre.getText().toString().equals(""))
+            Toast.makeText(this, "ingrese un nombre", Toast.LENGTH_SHORT).show();
+        else if (txtprecio.getText().toString().equals(""))
+            Toast.makeText(this, "ingrese un precio", Toast.LENGTH_SHORT).show();
+        else if (txtstock.getText().toString().equals(""))
+            Toast.makeText(this, "ingrese un stock", Toast.LENGTH_SHORT).show();
+        else {
+            double descuento;
+            boolean estado;
+            if (rbGrupo.getCheckedRadioButtonId() == R.id.rbCinco) {
+                descuento = 0.05;
+            } else {
+                descuento = 0.10;
+            }
+            if (ckEstado.isChecked()) {
+                estado = true;
+            } else {
+                estado = false;
+            }
+            System.out.println("CHECKED ESTADO:"+ckEstado.isChecked());
             Producto p = new Producto(Integer.parseInt(id),
                     txtnombre.getText().toString(),
                     spCategoria.getSelectedItem().toString(),
                     Double.parseDouble(txtprecio.getText().toString()),
-                    Integer.parseInt(txtstock.getText().toString()) );
-            System.out.println("MYID:"+p.getId());
+                    Integer.parseInt(txtstock.getText().toString()),
+                    descuento,
+                    estado);
+            System.out.println("MYID:" + p.getId());
             daoProducto.modificarProducto(p);
             finish();
         }
     }
-    private void eliminar(){
+
+    private void eliminar() {
         AlertDialog.Builder alerta = new AlertDialog.Builder(detalleProducto.this);
         alerta.setMessage("Esta seguro que desea eliminar este producto?")
                 .setCancelable(false)
@@ -149,10 +191,11 @@ public class detalleProducto extends AppCompatActivity {
         titulo.setTitle("Eliminar Producto");
         titulo.show();
     }
+
     private void cerrarteclado() {
         View view = this.getCurrentFocus();
         if (view != null) {
-            InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
     }

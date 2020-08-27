@@ -25,8 +25,10 @@ public class DAOProducto {
             ContentValues values = new ContentValues();
             values.put("nombreProd",prod.getNombre());
             values.put("categoriaProd",prod.getCategoria());
-            values.put("PrecioProd",prod.getPrecio());
-            values.put("StockProd",prod.getStock());
+            values.put("precioProd",prod.getPrecio());
+            values.put("stockProd",prod.getStock());
+            values.put("descuentoProd",prod.getDescuento());
+            values.put("estadoProd",prod.getEstado());
             database.insert(Constantes.NOMBRETABLA,null,values);
         }
         catch (Exception e){
@@ -38,12 +40,10 @@ public class DAOProducto {
             ContentValues values = new ContentValues();
             values.put("nombreProd",prod.getNombre());
             values.put("categoriaProd",prod.getCategoria());
-            values.put("PrecioProd",prod.getPrecio());
-            values.put("StockProd",prod.getStock());
-            System.out.println(values.get("nombreProd"));
-            System.out.println(values.get("categoriaProd"));
-            System.out.println(values.get("PrecioProd"));
-            System.out.println(values.get("StockProd"));
+            values.put("precioProd",prod.getPrecio());
+            values.put("stockProd",prod.getStock());
+            values.put("descuentoProd",prod.getDescuento());
+            values.put("estadoProd",prod.getEstado());
             database.update(Constantes.NOMBRETABLA,values,"id="+prod.getId(),null);
         }
         catch (Exception e){
@@ -64,14 +64,23 @@ public class DAOProducto {
         try{
 
             Cursor cursor = database.rawQuery("SELECT * FROM "+Constantes.NOMBRETABLA,null);
+
             while (cursor.moveToNext()){
+
+                Boolean estado;
+                if(cursor.getInt(6)==0) estado = false;
+                else estado= true;
+
                 lista.add(new Producto(
                         cursor.getInt(0),
                         cursor.getString(1),
                         cursor.getString(2),
                         cursor.getDouble(3),
-                        cursor.getInt(4)
+                        cursor.getInt(4),
+                        cursor.getDouble(5),
+                        estado
                 ));
+               ;
             }
         }
         catch (Exception e){

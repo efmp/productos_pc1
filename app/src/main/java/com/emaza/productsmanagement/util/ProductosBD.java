@@ -1,5 +1,6 @@
 package com.emaza.productsmanagement.util;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -19,11 +20,12 @@ public class ProductosBD extends SQLiteOpenHelper {
                 " (id integer Primary Key autoincrement," +
                 "nombreProd text not null,"+
                 "categoriaProd text not null,"+
-                "PrecioProd real not null,"+
-                "StockProd text not null);";
+                "precioProd real not null,"+
+                "stockProd text not null,"+
+                "descuentoProd real not null,"+
+                "estadoProd integer not null);";
         sqLiteDatabase.execSQL(commandSql);
     }
-
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
 

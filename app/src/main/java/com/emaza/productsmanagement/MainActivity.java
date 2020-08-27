@@ -93,6 +93,8 @@ public class MainActivity extends AppCompatActivity {
         p.add(prod.getCategoria());
         p.add(String.valueOf(prod.getPrecio()));
         p.add(String.valueOf(prod.getStock()));
+        p.add(String.valueOf(prod.getDescuento()));
+        p.add(String.valueOf(prod.getEstado()));
         b.putStringArrayList("data",p);
         detalle.putExtras(b);
         setResult(Activity.RESULT_OK,detalle);
