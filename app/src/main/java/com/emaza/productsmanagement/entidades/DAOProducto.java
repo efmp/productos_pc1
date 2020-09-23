@@ -88,4 +88,35 @@ public class DAOProducto {
         }
         return lista;
     }
+
+
+    public ArrayList<Producto> cargarProductosByName(String name){
+        ArrayList<Producto> lista = new ArrayList<>();
+        try{
+
+            Cursor cursor = database.rawQuery("SELECT * FROM "+Constantes.NOMBRETABLA+ " WHERE nombreProd LIKE '"+name+"%'",null);
+
+            while (cursor.moveToNext()){
+
+                Boolean estado;
+                if(cursor.getInt(6)==0) estado = false;
+                else estado= true;
+
+                lista.add(new Producto(
+                        cursor.getInt(0),
+                        cursor.getString(1),
+                        cursor.getString(2),
+                        cursor.getDouble(3),
+                        cursor.getInt(4),
+                        cursor.getDouble(5),
+                        estado
+                ));
+                ;
+            }
+        }
+        catch (Exception e){
+
+        }
+        return lista;
+    }
 }
